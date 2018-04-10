@@ -42,7 +42,8 @@ Wechaty.instance()
             if(!weatherTips){
                 weatherTips=true;
                 weather.timeSentInfo(contact, contact2,contact3,contact4);
-                message.say('天气提醒开启成功奥~')
+                message.say('天气提醒开启成功奥~');
+                console.log('天气服务开启成功');
             }else{
                 // weatherTips=false;
                 message.say('天气服务已经开启了哦，不要重复操作~');
