@@ -56,5 +56,5 @@ Wechaty.instance()
         }
         console.log(`${dateTime()}${message.from()}发送消息: ${message.content()} \n`)
     })
-    .init();
+    .start();
 
