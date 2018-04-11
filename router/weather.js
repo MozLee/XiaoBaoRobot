@@ -1,5 +1,6 @@
 const schedule = require('node-schedule') //时间任务管理 node-schedule
 const request = require('request');
+const dateTime = require('date-time');
 let tips = '小宝提醒您:北京春如四季,适当增减衣服，小心感冒哦~'
 function timeSentInfo(contact, contact2,contact3,contact4) {
     schedule.scheduleJob('0 0 7 * * *', () => {
@@ -35,7 +36,7 @@ function timeSentInfo(contact, contact2,contact3,contact4) {
         // console.log(data);
         // let weather = data.results[0].daily[0];
         // contact.say(`北京今日天气${weather.text_day}`);
-        console.log('定时发送天气任务' + new Date());
+        console.log('定时发送天气任务' + dateTime());
     })
 };
 module.exports.timeSentInfo=timeSentInfo;
