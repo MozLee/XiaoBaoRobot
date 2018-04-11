@@ -4,6 +4,8 @@ const {
 } = require('wechaty') //核心网页版微信 wechaty
 const weather = require('./router/weather');
 const dateTime = require('date-time');
+const Tuling123  = require('tuling123-client');
+const tuling = new Tuling123('c8bb5553bfc84de4940f50fbff15bf52')
 let weatherTips = false;
 Wechaty.instance()
     .on('scan', (url, code) => {
@@ -20,10 +22,6 @@ Wechaty.instance()
         const contact = message.from();
         const content = message.content();
         if (message.self()) {
-            return
-        }
-        if (/在/.test(content)) {
-            message.say('我还在线哦~')
             return
         }
         if (/开启APP/.test(content)) {
@@ -51,8 +49,15 @@ Wechaty.instance()
             }
             return
         }
-        if(/[\w\W]*/.test(content)){
-            message.say('小宝还在开发学习中哦~您可以联系MozLee激活天气提醒功能哦~')
+        // if(/[\w\W]*/.test(content)){
+        //     message.say('小宝还在开发学习中哦~您可以联系MozLee激活天气提醒功能哦~')
+        // }
+        //接入图灵机器人API
+        try {
+            const {text: reply} = await tuling.ask(message.content(), {userid: message.from()})
+            message.say(reply)
+          } catch (e) {
+            console.log(e)
         }
         console.log(`${dateTime()}${message.from()}发送消息: ${message.content()} \n`)
     })
