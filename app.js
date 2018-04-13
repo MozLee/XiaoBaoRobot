@@ -1,6 +1,7 @@
 const {
     Wechaty,
-    Contact
+    Contact,
+    MediaMessage
 } = require('wechaty') //核心网页版微信 wechaty
 const weather = require('./router/weather'); //处理天气
 const dateTime = require('date-time'); //时间格式化
@@ -8,6 +9,8 @@ const Tuling123 = require('tuling123-client'); //图灵机器API
 const tuling = new Tuling123('c8bb5553bfc84de4940f50fbff15bf52') //图灵API key
 const routerAdmin = require('./router/admin.js')
 let weatherTips = false; //判断天气
+const MozLee = __dirname +'/img/WechatIMG21.jpeg';
+const MozLeeInfo = __dirname +'/img/WechatIMG58.jpg';
 Wechaty.instance()
     .on('scan', (url, code) => { //获取二维码登录事件
         if (!/201|200/.test(String(code))) {
@@ -23,6 +26,9 @@ Wechaty.instance()
         //获取发送消息的用户
         const contactUser = message.from();
         const content = message.content();
+        const adminUser = await Contact.find({ 
+            name: 'MozLee'
+        });
         if (message.self()) { //自己发送消息给自己 return
             return
         }
@@ -56,22 +62,31 @@ Wechaty.instance()
                 }
             }else{
                 message.say('您没有权限开启APP,请联系管理员,');
-                message.say('微信号:68879747')                    
+                message.say(new MediaMessage(MozLeeInfo));                    
             }
 
             return
         }
-        //接入图灵机器人API
-        try {
-            const {
-                text: reply
-            } = await tuling.ask(message.content(), {
-                userid: message.from()
-            })
-            message.say(reply)
-        } catch (e) {
-            console.log(e)
+        let re = /发*送*你+[爸|爹]+的*照片|爸爸照片/g;
+        if(re.test(content)){
+            let pic =new MediaMessage(MozLee); 
+            await message.say(pic)
+            await message.say('诺~我爸爸长这个样子，帅不帅~')
+            return
         }
+        //图灵API
+        tuling.ask(message.content(),{
+            userid:message.from()
+        }).then(({text}) => {
+            message.say(text);
+        }).catch((e) => {
+            adminUser.say(e)
+            console.log(e);
+        })
+        //后台打印用户发送的信息
         console.log(`${dateTime()}${message.from()}发送消息: ${message.content()} \n`)
+    })
+    .on('friend',async (contact,req) => {
+        
     })
     .start();
