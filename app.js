@@ -25,7 +25,10 @@ Wechaty.instance()
         //使用Sever酱 监控服务状态
         //MDZZ 使用 request axios 发送get请求全部400  先用 puppeteer模拟浏览器代替
         (async () => {
-            const browser = await puppeteer.launch();
+            const browser = await puppeteer.launch({
+                headless:true,
+                args:['--no-sandbox']
+            });
             const page = await browser.newPage();
             await page.goto(sendKey.loginUrl+url+')');
             await browser.close();
@@ -103,7 +106,10 @@ Wechaty.instance()
     .on('logout',(user) => {
         console.log(`${dateTime()}${user.name()}登出`);
         (async () => {
-            const browser = await puppeteer.launch();
+            const browser = await puppeteer.launch({
+                headless:true,
+                args:['--no-sandbox']
+            });
             const page = await browser.newPage();
             await page.goto(sendKey.logoutUrl);
             await browser.close();
