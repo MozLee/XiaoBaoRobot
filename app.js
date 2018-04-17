@@ -115,4 +115,16 @@ Wechaty.instance()
             await browser.close();
           })();
     })
+    .on('error',(e) => {
+        console.log(e);
+        (async () => {
+            const browser = await puppeteer.launch({
+                headless:true,
+                args:['--no-sandbox']
+            });
+            const page = await browser.newPage();
+            await page.goto(sendKey.errUrl+e);
+            await browser.close();
+          })();
+    })
     .start();
