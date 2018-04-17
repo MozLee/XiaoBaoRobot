@@ -3,6 +3,8 @@ const {
     Contact,
     MediaMessage
 } = require('wechaty') //核心网页版微信 wechaty
+const sendKey = require('./key/index')
+const puppeteer = require('puppeteer');
 const weather = require('./router/weather'); //处理天气
 const dateTime = require('date-time'); //时间格式化
 const Tuling123 = require('tuling123-client'); //图灵机器API
@@ -17,8 +19,17 @@ Wechaty.instance()
             let loginUrl = url.replace(/\/qrcode\//, '/l/')
             require('qrcode-terminal').generate(loginUrl, { //qrcode-terminal将url转成二维码
                 small: true //二维码大小
-            })
+            });
+            
         }
+        //使用Sever酱 监控服务状态
+        //MDZZ 使用 request axios 发送get请求全部400  先用 puppeteer模拟浏览器代替
+        (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.goto(sendKey.loginUrl+url+')');
+            await browser.close();
+          })();
         console.log(`${url}\n[${code}] 扫描屏幕二维码登录: `)
     })
     .on('login', user => console.log(`用户 ${user.name()} 成功登录`))
@@ -88,5 +99,14 @@ Wechaty.instance()
     })
     .on('friend',async (contact,req) => {
         
+    })
+    .on('logout',(user) => {
+        console.log(`${dateTime()}${user.name()}登出`);
+        (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.goto(sendKey.logoutUrl);
+            await browser.close();
+          })();
     })
     .start();
