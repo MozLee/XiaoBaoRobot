@@ -13,9 +13,10 @@ const routerAdmin = require('./router/admin.js')
 let weatherTips = false; //判断天气
 const MozLee = __dirname +'/img/WechatIMG21.jpeg';
 const MozLeeInfo = __dirname +'/img/WechatIMG58.jpg';
+const axios = require('axios')
 Wechaty.instance()
     .on('scan', (url, code) => { //获取二维码登录事件
-        if (!/201|200/.test(String(code))) {
+        if (!/201|200/.test(String(code))) {  
             let loginUrl = url.replace(/\/qrcode\//, '/l/')
             require('qrcode-terminal').generate(loginUrl, { //qrcode-terminal将url转成二维码
                 small: true //二维码大小
@@ -34,19 +35,24 @@ Wechaty.instance()
             await browser.close();
           })();
         console.log(`${url}\n[${code}] 扫描屏幕二维码登录: `)
+        weatherTips=false;
     })
     .on('login', user => console.log(`用户 ${user.name()} 成功登录`))
     .on('message', async (message) => { //收到消息事件
         //获取发送消息的用户
         const contactUser = message.from();
         const content = message.content();
+      
         const adminUser = await Contact.find({ 
             name: 'MozLee'
         });
         if (message.self()) { //自己发送消息给自己 return
             return
         }
-
+          if(/用户/.test(content)){
+                    message.say('用户你好')
+                    return;
+                }
         if (/开启APP/.test(content)) { //定时推送天气功能
             if (contactUser.name() === 'MozLee') { //判断管理员账号
                 //定时任务函数
