@@ -1,9 +1,12 @@
-const schedule = require("node-schedule"); //时间任务管理 node-schedule
+ //时间任务管理 node-schedule
+const schedule = require("node-schedule");
+//连接数据库
 const dbconection = require("../dbconnect");
+//数据库User模型
 const User = require("../../model/user");
+//axios 发送ajax
 const axios = require("axios");
 const baseURL = `https://api.seniverse.com/v3/weather/daily.json?key=9wf1etjmyn8kasuw&language=zh-Hans&unit=c&start=0&days=5&location=`;
-
 let $http = axios.create({
   timeout: 10000
 });
@@ -12,6 +15,7 @@ let $http = axios.create({
 function unique(arr) {
   return Array.from(new Set(arr));
 }
+
 //获取用户所在位置
 function getCity() {
   let city = [];
@@ -31,7 +35,7 @@ function getCity() {
   });
 }
 
-//用户分区
+//用户按数据中的实际所在地区分组
 function getUsersClassify(weatherUsers) {
     if(!weatherUsers){
         console.log('请检查！！getUsersClassify()的参数');
@@ -56,7 +60,10 @@ function getUsersClassify(weatherUsers) {
       });
     });
   }
+//连接一下数据库
 dbconection();
+
+
 
 /**
  * 发送天气
@@ -69,8 +76,10 @@ function sendWeatherInfo({time="0 * * * * *",Contact}) {
     console.log('天气服务开启成功');
     console.log('天气推送时间间隔'+time);
     schedule.scheduleJob(time, async () => {
+        //获取相关信息，citys用户有哪些城市['Beijing','Dalian']
         let citys = await getCity();
         let weatherUsers = [];
+        //获取天气数据
         await(() => {
             return new Promise((resolve, reject) => {
               let n = 0;  
@@ -84,15 +93,37 @@ function sendWeatherInfo({time="0 * * * * *",Contact}) {
                 });
             })    
         })()
+
+        //将用户以不同的地区分类
         await getUsersClassify(weatherUsers);
-        console.log(weatherUsers);
+        // console.log(weatherUsers);
+        
+        //处理天气
+        let baseText = ``;
         weatherUsers.forEach((item) => {
+            //处理数据
+            let weCity = item.data.results[0].location.name;
+            let weData = item.data.results[0].daily[0];
+            // console.log(weData);
+            //解构数据
+            let {date,text_day,text_night,high,low,wind_direction,wind_direction_degree,wind_speed,wind_scale} = weData; 
+            //获取eomoj
+            let {getEmoj} = require('./getEmoj'); //TODO:完善emoji内容
+            let dayEmoj = getEmoj(text_day);
+            let nightEmoj = getEmoj(text_night);    
+            let normalText = `${weCity}今日白天/:sun${text_day}${dayEmoj}\n今日夜间/:moon${text_night}${nightEmoj}\n最高气温${high}°C,最低气温${low}°C\n${wind_direction}风,💨指数${wind_scale}`;   
             item.user.forEach(async (user) => {
                 let a = await Contact.find({
                     alias:user
                 })
-                a.say('您的城市是'+item.city)
-                console.log(`向用户昵称${a.name},ID:${a.alias}推送天气成功`);
+                if(a.star()){ //是否为星标用户，名字高亮
+                  await a.say(`亲爱哒/:rose✨${a.name()}✨\n${normalText}`)
+                  console.log(`向【VIP】用户昵称${a.name()},ID:${a.alias()}推送天气成功`);                                     
+                }else{
+                   //普通用户，无名字
+                   await a.say(normalText);
+                   console.log(`向【普通】用户昵称${a.name()},ID:${a.alias()}推送天气成功`);                   
+                }
             })
         })
       });
