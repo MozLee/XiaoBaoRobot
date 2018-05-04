@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/MozLee/XiaoBaoRobot#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "crypto-random-string": "^1.0.0",
     "mongoose": "^5.0.17",
+    "node-schedule": "^1.3.0",
     "qrcode-terminal": "^0.12.0",
     "wechaty": "^0.14.1"
   }

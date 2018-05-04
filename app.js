@@ -27,43 +27,26 @@ Wechaty.instance()
   .on("login", async user => {
     console.log("---------------------------------------");
     console.log(`用户[${user.name()}]成功登录`);
+    //连接数据库
     console.log("---------------------------------------");
     console.log("数据库连接中");
     await dbconnection();
-    let allUsers = await Contact.findAll();
-    // console.log( allUsers[0].weixin());
-    let result = [];
-    console.log(allUsers);
-    allUsers.forEach(item => {
-      result.push(item.obj);
-    });
-    result.forEach(item => {
-      User.findOne({
-        alias: item.alias
-      }).then(result => {
-        if (result) {
-          console.log("已经存在" + item.id);
-        } else {
-          console.log(`未查询到ID${item.id}`);
-          let xbUser = new User({
-            name: item.name, //微信昵称
-            alias: item.alias, //备注昵称
-            sex: item.sex, //性别 1男 0女
-            province: item.province, //省
-            city: item.city, //城市
-            signature: item.signature, //个性签名
-            address: item.address, //地址
-            star: item.star, //星标好友
-            stranger: item.stranger, //陌生人
-            avatar: item.avatar, //头像地址
-            official: item.official, //官方？？？？？
-            special: item.special //特别关心
-          });
-          xbUser.save((err) => {
-            console.log('保存状态',err?'失败':'成功 name'+item.alias);
-          })
-        }
-      });
-    });
+    //天气
+    const weather = require('./router/weather/weatherTask')
+    weather.sendWeatherInfo({
+        Contact
+    })
+    //获取所有用户
+    // const getAllUsers = require('./router/getAllUsers')
+    // let a = await getAllUsers()
+    // console.log(a.length);
+  })
+  .on('message',async mes=>{
+      let sender = await mes.from();
+      let text = await mes.content();
+      if(mes.self()){
+          return
+      };      
+      console.log(`[${sender.name()}]:[${text}]`);
   })
   .start();
