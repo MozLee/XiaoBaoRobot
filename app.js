@@ -11,6 +11,7 @@ const dbconnection = require("./router/dbconnect");
 //引入User模型
 const User = require("./model/user");
 
+let n = 0;
 //wechaty初始化
 Wechaty.instance()
   //扫描二维码阶段
@@ -29,11 +30,12 @@ Wechaty.instance()
     console.log(`用户[${user.name()}]成功登录`);
     //连接数据库
     console.log("---------------------------------------");
-    console.log("数据库连接中");
+    console.log("数据库连接中")
     await dbconnection();
     //天气
     const weather = require('./router/weather/weatherTask')
     weather.sendWeatherInfo({
+        time:'0 * * * * *',
         Contact
     })
     //获取所有用户
@@ -48,5 +50,9 @@ Wechaty.instance()
           return
       };      
       console.log(`[${sender.name()}]:[${text}]`);
+  })
+  .on('heartbeat',(data) => {
+        n++;
+        console.log('心跳包，我已经跳动'+n+'次');
   })
   .start();
