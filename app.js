@@ -35,7 +35,7 @@ Wechaty.instance()
     //天气
     const weather = require('./router/weather/weatherTask')
     weather.sendWeatherInfo({
-        time:'0 * * * * *',
+        time:'0 0 7 * * *',
         Contact
     })
     //获取所有用户
