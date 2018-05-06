@@ -12,6 +12,7 @@ const dbconnection = require("./router/dbconnect");
 const User = require("./model/user");
 
 let n = 0;
+let weatherService = false //初始天气服务
 //wechaty初始化
 Wechaty.instance()
   //扫描二维码阶段
@@ -34,10 +35,12 @@ Wechaty.instance()
     await dbconnection();
     //天气
     const weather = require('./router/weather/weatherTask')
+    if(weatherService)return;
     weather.sendWeatherInfo({
         time:'0 0 7 * * *',
         Contact
     })
+    weatherService = true;
     //获取所有用户
     // const getAllUsers = require('./router/getAllUsers')
     // let a = await getAllUsers()
@@ -51,7 +54,7 @@ Wechaty.instance()
       };      
       console.log(`[${sender.name()}]:[${text}]`);
   })
-  .on('heartbeat',(data) => {
+  .on('heartbeat',(data) =>   {
         n++;
         console.log('心跳包，我已经跳动'+n+'次');
   })
