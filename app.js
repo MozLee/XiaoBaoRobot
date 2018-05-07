@@ -1,6 +1,11 @@
 //引入核心Wechaty
-const { Wechaty, Contact ,Room} = require("wechaty");
+const {
+  Wechaty,
+  Contact,
+  Room
+} = require("wechaty");
 
+const fs = require('fs')
 //引入qrcode-terminal用于生成二维码
 const qrcodeTerminal = require("qrcode-terminal");
 
@@ -46,45 +51,55 @@ Wechaty.instance()
     console.log("---------------------------------------");
     console.log("数据库连接中")
     await dbconnection();
-
+  
     //天气
     const weather = require('./router/weather/weatherTask')
-    if(weatherService)return;
-    weather.sendWeatherInfo({
-        time:'0 0 7 * * *',
+    if (weatherService) {
+      return
+    } else {
+      weather.sendWeatherInfo({
+        time: '0 0 7 * * *',
         Contact
-    })
-    weatherService = true;
-
-    //获取所有用户
+      })
+      weatherService = true;
+    };
+    // 获取所有用户
     // const getAllUsers = require('./router/getAllUsers')
-    // let a = await getAllUsers()
-    // console.log(a.length);
-
+    // let a = await getAllUsers(5);
+    // 获取头像
+    // a.forEach(async(item) => {
+    //   const fileName = await item.alias()+'.jpg';
+    //   const readFile = await item.avatar();
+    //   const saveFile = fs.createWriteStream('./avatar/'+fileName);
+    //   readFile.pipe(saveFile);
+    //   console.log(item.name()+'头像保存成功');
+    // });
     //心跳信息防止掉线
     const FDX = await Room.find({
-      topic:'FDX',
+      topic: 'FDX',
     })
-    if(timer)return
+    if (timer) return
     timer = setInterval(() => {
-      FDX.say('XiaoBaoHeartBeat\n'+dateTime());
-      console.log(`[${dateTime()}]`+'发送心跳信息');
-    },1000*60*30) //每隔30分钟发一次
+      FDX.say('XiaoBaoHeartBeat\n' + dateTime());
+      console.log(`[${dateTime()}]` + '发送心跳信息');
+    }, 1000 * 60 * 30) //每隔30分钟发一次
   })
-  .on('message',async mes=>{
-      let sender = await mes.from();
-      let text = await mes.content();
-      if(mes.self()){
-          return
-      }; 
-      mes.say('小宝还在建设中，请耐心等待，当前提供天气服务。')     
-      console.log(`[${dateTime()}][${sender.name()}]:[${text}]`);
+  .on('message', async mes => {
+    let sender = await mes.from();
+    let text = await mes.content();
+    if (mes.self()) {
+      return
+    };
+    console.log(`---------------------`);
+    console.log(`---------------------`);    
+    mes.say('小宝还在建设中，请耐心等待，当前提供天气服务。')
+    console.log(`[${dateTime()}][${sender.name()}]:[${text}]`);
   })
-  .on('heartbeat',(data) =>  {
+  .on('heartbeat', (data) => {
 
   })
-  .on('logout',(user) => {
-     console.log(`${user.name()}登出${dateTime()}`);
-     serverChan.logout ();
+  .on('logout', (user) => {
+    console.log(`${user.name()}登出${dateTime()}`);
+    serverChan.logout();
   })
   .start();
