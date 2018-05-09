@@ -5,7 +5,9 @@ const {
   Room
 } = require("wechaty");
 
-const fs = require('fs')
+// const fs = require('fs')
+//随机ID
+const rdId = require('crypto-random-string');
 //引入qrcode-terminal用于生成二维码
 const qrcodeTerminal = require("qrcode-terminal");
 
@@ -51,7 +53,7 @@ Wechaty.instance()
     console.log("---------------------------------------");
     console.log("数据库连接中")
     await dbconnection();
-  
+
     //天气
     const weather = require('./router/weather/weatherTask')
     if (weatherService) {
@@ -91,12 +93,43 @@ Wechaty.instance()
       return
     };
     console.log(`---------------------`);
-    console.log(`---------------------`);    
+    console.log(`---------------------`);
     mes.say('小宝还在建设中，请耐心等待，当前提供天气服务。')
     console.log(`[${dateTime()}][${sender.name()}]:[${text}]`);
   })
   .on('heartbeat', (data) => {
 
+  })
+  .on('friend', async (contact, req) => {
+    if (req) {
+      if (req.hello === '李鑫最帅') {
+        req.accept();
+        //将用户信息写入数据库
+        //TODO:新用户加好友处理数据后 写入数据库 注意 头像 与 备注 ID的问题
+        // let friend = new User({
+        //   name: contact.name(), //微信昵称
+        //   alias: 'nc'+rdId(5), //备注昵称
+        //   sex: contact.sex(), //性别 1男 0女
+        //   province: contact.province(), //省
+        //   city: contact.city, //城市
+        //   signature: contact.signature, //个性签名
+        //   address: contact.address, //地址
+        //   star: contact.star, //星标好友
+        //   stranger: contact.stranger, //陌生人
+        //   avatar: contact.avatar, //头像地址
+        //   official: contact.official, //官方？？？？？
+        //   special: contact.special //特别关心
+        // })
+      } else {
+        console.log(`小宝没有同意${contact.name()}加为好友，口令不正确`);
+        let mozlee = await Contact.find({
+          name: 'MozLee'
+        });
+        mozlee.say(`${contact.name()}请求小宝为好友,但是口令不正确，口令为${req.hello}`)
+      }
+    } else {
+      console.log(`请求确认好友+${contact.name()}`);
+    }
   })
   .on('logout', (user) => {
     console.log(`${user.name()}登出${dateTime()}`);
