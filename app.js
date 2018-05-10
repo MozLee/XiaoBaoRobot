@@ -5,7 +5,7 @@ const {
   Room
 } = require("wechaty");
 
-// const fs = require('fs')
+const fs = require('fs')
 //随机ID
 const rdId = require('crypto-random-string');
 //引入qrcode-terminal用于生成二维码
@@ -19,7 +19,6 @@ const dbconnection = require("./router/dbconnect");
 const User = require("./model/user");
 
 //引入时间模块
-const dayjs = require("dayjs");
 const dateTime = require('date-time');
 
 //引入server酱 微信提示错误以及登录等相关消息
@@ -47,8 +46,8 @@ Wechaty.instance()
   //成功登录阶段
   .on("login", async user => {
     console.log("---------------------------------------");
+    console.log(user.obj);
     console.log(`用户[${user.name()}]成功登录`);
-
     //连接数据库
     console.log("---------------------------------------");
     console.log("数据库连接中")
@@ -93,33 +92,53 @@ Wechaty.instance()
       return
     };
     console.log(`---------------------`);
-    console.log(`---------------------`);
+    // console.log(mes.obj);
+    let uu = await Contact.find({name:'MozLee'});
+    console.log(uu.obj);
     mes.say('小宝还在建设中，请耐心等待，当前提供天气服务。')
     console.log(`[${dateTime()}][${sender.name()}]:[${text}]`);
+    console.log(`---------------------`);    
   })
   .on('heartbeat', (data) => {
 
   })
   .on('friend', async (contact, req) => {
     if (req) {
-      if (req.hello === '李鑫最帅') {
-        req.accept();
+      if (req.hello === 'moz') {
+        //新用户加好友处理数据后 写入数据库 注意 头像 与 备注 ID的问题        
+        await req.accept();
+        let name = contact.name();
+        let newUser = await Contact.find({name:name});
+        console.log('oldAlias'+newUser.alias());
+        let xbId = rdId(5);        
+        await newUser.alias(`xb${xbId}`)
+        let userInfo = newUser.obj;
+        console.log(userInfo);
+        console.log('新加好友'+contact.name());
+        console.log('更改alias为xb'+xbId);
         //将用户信息写入数据库
-        //TODO:新用户加好友处理数据后 写入数据库 注意 头像 与 备注 ID的问题
-        // let friend = new User({
-        //   name: contact.name(), //微信昵称
-        //   alias: 'nc'+rdId(5), //备注昵称
-        //   sex: contact.sex(), //性别 1男 0女
-        //   province: contact.province(), //省
-        //   city: contact.city, //城市
-        //   signature: contact.signature, //个性签名
-        //   address: contact.address, //地址
-        //   star: contact.star, //星标好友
-        //   stranger: contact.stranger, //陌生人
-        //   avatar: contact.avatar, //头像地址
-        //   official: contact.official, //官方？？？？？
-        //   special: contact.special //特别关心
-        // })
+        let cacheUser = new User({
+          name:userInfo.name,//微信昵称
+          alias:`xb${xbId}`,//备注昵称
+          sex:userInfo.sex,//性别 1男 0女
+          province:userInfo.province,//省
+          city:userInfo.city,//城市
+          nowcity:'beijing',//当前所在城市
+          signature:userInfo.signature,//个性签名
+          address:userInfo.address,//地址
+          star:userInfo.star,//星标好友
+          stranger:userInfo.stranger,//陌生人
+          avatar:userInfo.avatar,//头像地址
+          official:userInfo.official,//官方？？？？？
+          special:userInfo.special,//特别关心????
+          weatherSevice:true
+        })    
+        cacheUser.save(); 
+        const fileName = await newUser.alias()+'.jpg';
+        const readFile = await newUser.avatar();
+        const saveFile = fs.createWriteStream('./avatar/'+fileName);
+        readFile.pipe(saveFile);
+        console.log(newUser.name()+newUser.alias()+'头像保存成功');   
       } else {
         console.log(`小宝没有同意${contact.name()}加为好友，口令不正确`);
         let mozlee = await Contact.find({
@@ -136,3 +155,27 @@ Wechaty.instance()
     serverChan.logout();
   })
   .start();
+
+  //HTTP服务
+  const express = require('express');
+  const app = express();
+  const cors = require('cors');
+  app.use(cors({credentials: true, origin: 'http://localhost:8080'}))
+  //api
+  app.get('/updateall',async (req,res,next) => {
+      const getAllUsers = require('./router/getAllUsers')
+      let a = await getAllUsers(5,5000)
+      // let info = a.obj;
+         // 获取头像
+      a.forEach(async(item) => {
+        const fileName = await item.alias()+'.jpg';
+        const readFile = await item.avatar();
+        const saveFile = fs.createWriteStream('./avatar/'+fileName);
+        readFile.pipe(saveFile);
+        console.log(item.name()+'头像保存成功');
+      });
+      res.json({data:a,code:0,message:"获取全部用户信息成功"})
+  })
+  app.listen(3001,() => {
+    console.log('HTTP服务开启成功，监听3001');
+  })

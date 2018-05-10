@@ -15,6 +15,6 @@ const WechatUser = new mongoose.Schema({
     avatar:String,//头像地址
     official:Boolean,//官方？？？？？
     special:Boolean,//特别关心????
-    weatherSevice:Boolean
+    weatherService:Boolean
 })
 module.exports = WechatUser
