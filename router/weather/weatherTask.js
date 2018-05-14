@@ -20,13 +20,16 @@ function unique(arr) {
 function getCity() {
   let city = [];
   return new Promise((resolve, reject) => {
-    User.find({}, (err, doc) => {
+    User.find({
+      weatherService:true
+    }, (err, doc) => {
       if (err) {
         console.log(`【数据库ERR】:${err}`);
         reject(err);
         return;
       }
       doc.forEach(item => {
+        console.log(item.name+'天气服务'+item.weatherService);
         city.push(item.nowcity);
       });
       city = unique(city);
@@ -42,7 +45,9 @@ function getUsersClassify(weatherUsers) {
         return;
     }
     return new Promise((resolve, reject) => {
-      User.find({}, (err, doc) => {
+      User.find({
+        weatherService:true
+      }, (err, doc) => {
         if (err) {
           console.log(`【数据库ERR】:${err}`);
           reject(err);
@@ -111,7 +116,8 @@ function sendWeatherInfo({time="0 * * * * *",Contact}) {
             let {getEmoj} = require('./getEmoj'); //TODO:完善emoji内容
             let dayEmoj = getEmoj(text_day);
             let nightEmoj = getEmoj(text_night);    
-            let normalText = `${weCity}今日白天/:sun${text_day}${dayEmoj}\n今日夜间/:moon${text_night}${nightEmoj}\n最高气温${high}°C,最低气温${low}°C\n${wind_direction}风,💨指数${wind_scale}`;   
+            let normalText = `${weCity}今日白天${text_day}${dayEmoj}\n今日夜间${text_night}${nightEmoj}\n最高气温${high}°C,最低气温${low}°C\n${wind_direction}风,💨指数${wind_scale}`;  
+            console.log(item.user); 
             item.user.forEach(async (user) => {
                 let a = await Contact.find({
                     alias:user

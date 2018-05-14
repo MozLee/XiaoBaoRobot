@@ -5,9 +5,12 @@ const {
   Room
 } = require("wechaty");
 
+//fs模块
 const fs = require('fs')
+
 //随机ID
 const rdId = require('crypto-random-string');
+
 //引入qrcode-terminal用于生成二维码
 const qrcodeTerminal = require("qrcode-terminal");
 
@@ -15,9 +18,9 @@ const qrcodeTerminal = require("qrcode-terminal");
 const mongoose = require("mongoose");
 //引入数据库连接
 const dbconnection = require("./router/dbconnect");
-//引入User模型
+//引入User模型 Xbstate模型
 const User = require("./model/user");
-
+const XbState = require('./model/xbstate');
 //引入时间模块
 const dateTime = require('date-time');
 
@@ -30,7 +33,7 @@ let timer = null;
 Wechaty.instance()
 
   //扫描二维码阶段
-  .on("scan", (url, code) => {
+  .on("scan", async (url, code) => {
     if (!/200|201/.test(String(code))) {
       const loginUrl = url.replace(/\/qrcode\//, "/l/");
       qrcodeTerminal.generate(loginUrl, {
@@ -39,6 +42,9 @@ Wechaty.instance()
 
       //server酱推送二维码
       serverChan.login(url);
+      console.log("数据库连接中")      
+      await dbconnection();
+      updateXbstate(0,'已掉线(小宝扫描登录中)');
     }
     console.log(`${url}\n[${code}]扫描此url二维码登录`);
   })
@@ -50,16 +56,15 @@ Wechaty.instance()
     console.log(`用户[${user.name()}]成功登录`);
     //连接数据库
     console.log("---------------------------------------");
-    console.log("数据库连接中")
-    await dbconnection();
-
+    updateXbstate(1,'正常');    
     //天气
     const weather = require('./router/weather/weatherTask')
     if (weatherService) {
+      console.log('天气服务已经开启，无须再次开启');
       return
     } else {
       weather.sendWeatherInfo({
-        time: '0 0 7 * * *',
+        time: '0 * * * * *',
         Contact
       })
       weatherService = true;
@@ -92,9 +97,6 @@ Wechaty.instance()
       return
     };
     console.log(`---------------------`);
-    // console.log(mes.obj);
-    let uu = await Contact.find({name:'MozLee'});
-    console.log(uu.obj);
     mes.say('小宝还在建设中，请耐心等待，当前提供天气服务。')
     console.log(`[${dateTime()}][${sender.name()}]:[${text}]`);
     console.log(`---------------------`);    
@@ -179,3 +181,27 @@ Wechaty.instance()
   app.listen(3001,() => {
     console.log('HTTP服务开启成功，监听3001');
   })
+
+
+
+ //更新小宝的登录状态
+ 
+/**
+ * 
+ * 
+ * @param {Number} code 
+ * @param {String} state 
+ */
+function updateXbstate(code,state) {
+  XbState.findOne({
+    id:'xbstate'
+  },(err,doc) => {
+    if(err){
+      console.log('Error'+err);
+      return
+    }
+    doc.code = code;
+    doc.state = state;
+    doc.save()
+  }) 
+}    
