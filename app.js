@@ -67,7 +67,7 @@ Wechaty.instance()
             weatherTime.findOne({
                 id: 'time'
             }, (err, doc) => {
-               console.log('doc-time'+doc.time);
+                console.log('doc-time' + doc.time);
                 weather.sendWeatherInfo({
                     time: doc.time,
                     Contact
@@ -173,9 +173,45 @@ const app = express();
 const cors = require('cors');
 app.use(cors({
     credentials: true,
-    origin: 'http://localhost:8080'
+    origin: 'http://xb.sy1x.com:8080'
 }))
 //api
+app.get('/updateid', async (req, res, next) => {
+    let oldId = req.query.oldid;
+    let newId = req.query.id;
+    console.log(oldId);
+    console.log(newId);
+    User.findOne({
+        alias: newId
+    }, (err, doc) => {
+        console.log(doc);
+        if (doc) {
+            res.json({
+                code: 1,
+                message: '该ID已经存在,请更换'
+            })
+            return;
+        }
+        User.findOne({
+            alias: oldId
+        }, async (err, doc) => {
+            if (doc) {
+                doc.alias = newId;
+                doc.save();
+                let weuser = await Contact.find({
+                    alias: oldId
+                })
+                weuser.alias(newId);
+                fs.renameSync(`./avatar/${oldId}.jpg`,`./avatar/${newId}.jpg`);
+                res.json({
+                    code: 0,
+                    message: '修改ID成功'
+                })
+            }
+        })
+    })
+
+})
 app.get('/updateall', async (req, res, next) => {
     const getAllUsers = require('./router/getAllUsers')
     let a = await getAllUsers(5, 5000)
