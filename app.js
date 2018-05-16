@@ -28,8 +28,13 @@ const dateTime = require('date-time');
 //引入server酱 微信提示错误以及登录等相关消息
 const serverChan = require('./server/ServerChan')
 
+//图灵
+const Tuling123 = require('tuling123-client'); //图灵机器API
+const tuling = new Tuling123('c8bb5553bfc84de4940f50fbff15bf52') //图灵API key
+
 let weatherService = false //初始天气服务
 let timer = null;
+let avatarUrl = './avatar/'
 //wechaty初始化
 Wechaty.instance()
 
@@ -104,7 +109,13 @@ Wechaty.instance()
             return
         };
         console.log(`---------------------`);
-        mes.say('小宝还在建设中，请耐心等待，当前提供天气服务。')
+        tuling.ask(message.content(),{
+            userid:message.from()
+        }).then(({text}) => {
+            message.say(text);
+        }).catch((e) => {
+            console.log(e);
+        })
         console.log(`[${dateTime()}][${sender.name()}]:[${text}]`);
         console.log(`---------------------`);
     })
@@ -147,7 +158,7 @@ Wechaty.instance()
                 cacheUser.save();
                 const fileName = await newUser.alias() + '.jpg';
                 const readFile = await newUser.avatar();
-                const saveFile = fs.createWriteStream('./avatar/' + fileName);
+                const saveFile = fs.createWriteStream(avatarUrl + fileName);
                 readFile.pipe(saveFile);
                 console.log(newUser.name() + newUser.alias() + '头像保存成功');
             } else {
@@ -202,7 +213,7 @@ app.get('/updateid', async (req, res, next) => {
                     alias: oldId
                 })
                 weuser.alias(newId);
-                fs.renameSync(`./avatar/${oldId}.jpg`,`./avatar/${newId}.jpg`);
+                fs.renameSync(avatarUrl+`${oldId}.jpg`,avatarUrl+`${newId}.jpg`);
                 res.json({
                     code: 0,
                     message: '修改ID成功'
@@ -220,7 +231,7 @@ app.get('/updateall', async (req, res, next) => {
     a.forEach(async (item) => {
         const fileName = await item.alias() + '.jpg';
         const readFile = await item.avatar();
-        const saveFile = fs.createWriteStream('./avatar/' + fileName);
+        const saveFile = fs.createWriteStream(avatarUrl + fileName);
         readFile.pipe(saveFile);
         console.log(item.name() + '头像保存成功');
     });
