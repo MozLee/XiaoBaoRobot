@@ -109,10 +109,10 @@ Wechaty.instance()
             return
         };
         console.log(`---------------------`);
-        tuling.ask(message.content(),{
-            userid:message.from()
+        tuling.ask(mes.content(),{
+            userid:mes.from()
         }).then(({text}) => {
-            message.say(text);
+            mes.say(text);
         }).catch((e) => {
             console.log(e);
         })
