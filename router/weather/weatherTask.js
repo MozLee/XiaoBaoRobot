@@ -4,6 +4,8 @@
  const dbconection = require("../dbconnect");
  //数据库User模型
  const User = require("../../model/user");
+ const weatherTime = require("../../model/weathertime"); 
+ 
  //axios 发送ajax
  const axios = require("axios");
  const baseURL = `https://api.seniverse.com/v3/weather/daily.json?key=9wf1etjmyn8kasuw&language=zh-Hans&unit=c&start=0&days=5&location=`;
@@ -155,10 +157,16 @@
          })
          s.cancel();
          //TODO:递归查询数据库时间 更新新的推送天气时间
-         sendWeatherInfo({
-             time: '10 * * * * *',
-             Contact
-         })
+         weatherTime.findOne({
+            id: 'time'
+        }, (err, doc) => {
+           console.log('doc-time'+doc.time);
+            sendWeatherInfo({
+                time: doc.time,
+                Contact
+            })
+        })
+
      });
  }
  module.exports.sendWeatherInfo = sendWeatherInfo;
