@@ -20,11 +20,12 @@ Node.js + Wechaty + Express + MongoDB
 ## 加好友体验
 > 加好友的口令为 moz
 
-![二维码](http://mozlee.com/githubimg/xbewm.jpeg)
+![二维码](http://mozlee.com/githubimg/xbewm.jpeg=200)
 
 ## 小宝系统
-[小宝管理系统--前端(移动端)][2] 技术栈 vue+vue-router+vuex+vux
-[小宝管理系统--后端][3]技术栈 Nodejs+Express+MongoDB
+- [小宝管理系统--前端(移动端)][2] 技术栈 vue+vue-router+vuex+vux
+
+- [小宝管理系统--后端][3]技术栈 Nodejs+Express+MongoDB
 
 
   [1]: http://mozlee.com/githubimg/xbrobot.jpg
