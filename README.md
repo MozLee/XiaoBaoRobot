@@ -15,15 +15,19 @@ Node.js + Wechaty + Express + MongoDB
 ## 所遇问题及解决方案
 
 **问题1**:启动应用时，需要手动复制登录url到浏览器，然后进行扫码登录。
+
 **解决方案**:使用 qrcode-terminal 包将url转换成终端二维码直接在终端扫描登录。
+
 ![](http://mozlee.com/githubimg/WX20180522-111836@2x.webp)
 
 **问题2**:每次小宝掉线重新登录都需要登录到远程服务器进行扫码登录。
+
 **解决方案**:利用Server酱,将登陆二维码直接发送到管理员的微信上。
 
 ![](http://mozlee.com/githubimg/WechatIMG29.webp)
 
 **问题3**:小宝频繁掉线
+
 **解决方案**:模拟心跳,向一个指定微信群发送心跳包,维持在线。
 
 
