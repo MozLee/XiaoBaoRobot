@@ -44,7 +44,7 @@ Node.js + Wechaty + Express + MongoDB
 ## 小宝系统
 - [小宝管理系统--前端(移动端)][2] 技术栈 vue+vue-router+vuex+vux
 
-- [小宝管理系统--后端][3技术栈 Nodejs+Express+MongoDB
+- [小宝管理系统--后端][3]技术栈 Nodejs+Express+MongoDB
 
 - 核心依赖 [Wechaty](https://github.com/Chatie/wechaty)
 
