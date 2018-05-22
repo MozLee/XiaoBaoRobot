@@ -22,7 +22,7 @@ Node.js + Wechaty + Express + MongoDB
 
 **问题2**:每次小宝掉线重新登录都需要登录到远程服务器进行扫码登录。
 
-**解决方案**:利用Server酱,将登陆二维码直接发送到管理员的微信上。
+**解决方案**:利用Server酱,只需发送一个GET/POST请求，就会将登陆二维码直接发送到管理员的微信上。
 
 ![](http://mozlee.com/githubimg/WechatIMG29.webp)
 
