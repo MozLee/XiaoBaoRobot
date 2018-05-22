@@ -42,12 +42,11 @@ Node.js + Wechaty + Express + MongoDB
 ![二维码](http://mozlee.com/githubimg/xbewm.jpeg)
 
 ## 小宝系统
-- [小宝管理系统--前端(移动端)][2] 技术栈 vue+vue-router+vuex+vux
+- [小宝管理系统--前端(移动端)](https://github.com/MozLee/XiaoBaoManagement) 技术栈 vue+vue-router+vuex+vux
 
-- [小宝管理系统--后端][3]技术栈 Nodejs+Express+MongoDB
+- [小宝管理系统--后端](https://github.com/MozLee/XiaoBaoSystem) 技术栈 Nodejs+Express+MongoDB
 
+- [小宝Robot](https://github.com/MozLee/XiaoBaoRobot) 技术栈 Nodejs + Wechaty
 - 核心依赖 [Wechaty](https://github.com/Chatie/wechaty)
 
   [1]: http://mozlee.com/githubimg/xbrobot.jpg
-  [2]: https://github.com/MozLee/XiaoBaoManagement
-  [3]: https://github.com/MozLee/XiaoBaoSystem
