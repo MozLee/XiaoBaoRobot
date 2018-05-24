@@ -158,7 +158,7 @@
          s.cancel();
          //TODO:递归查询数据库时间 更新新的推送天气时间
          weatherTime.findOne({
-            id: 'time'
+            id: 'newtime'
         }, (err, doc) => {
            console.log('doc-time'+doc.time);
             sendWeatherInfo({
