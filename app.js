@@ -34,7 +34,9 @@ const tuling = new Tuling123('c8bb5553bfc84de4940f50fbff15bf52') //图灵API key
 
 let weatherService = false //初始天气服务
 let timer = null;
-let avatarUrl = './avatar/'
+//
+const {avatarPath} = require('./config/config')
+let avatarUrl = avatarPath;
 //wechaty初始化
 Wechaty.instance()
 
