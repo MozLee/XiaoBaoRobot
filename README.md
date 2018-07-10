@@ -43,8 +43,6 @@ Node.js + Wechaty + Express + MongoDB
 ## 加好友体验
 > 加好友的口令为 moz
 
-![二维码](http://mozlee.com/githubimg/xbewm.jpeg)
-
 ## 小宝系统
 - [小宝管理系统--前端(移动端)](https://github.com/MozLee/XiaoBaoManagement) 技术栈 vue+vue-router+vuex+vux
 
